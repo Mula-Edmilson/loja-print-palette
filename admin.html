@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin | Print Palette</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body { font-family: 'Poppins', sans-serif; background-color: #111827; color: #d1d5db; }
+        .form-input { background-color: #1f2937; border: 1px solid #374151; color: #d1d5db; }
+        .form-input::placeholder { color: #6b7280; }
+        .switch { position: relative; display: inline-block; width: 60px; height: 34px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #374151; transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 26px; width: 26px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: #8b5cf6; }
+        input:checked + .slider:before { transform: translateX(26px); }
+    </style>
+</head>
+<body>
+
+    <div id="login-container" class="min-h-screen flex items-center justify-center">
+        <div class="bg-gray-800 p-8 rounded-lg shadow-xl w-full max-w-md">
+            <h1 class="text-2xl font-bold text-purple-400 mb-6 text-center">Admin Login</h1>
+            <form id="login-form" class="space-y-4">
+                <input type="email" id="login-email" placeholder="Email" class="w-full p-3 rounded form-input" required>
+                <input type="password" id="login-password" placeholder="Palavra-passe" class="w-full p-3 rounded form-input" required>
+                <button type="submit" class="w-full bg-purple-500 hover:bg-purple-600 text-white font-bold py-3 rounded">Entrar</button>
+            </form>
+            <p id="login-error" class="text-red-400 text-center mt-4"></p>
+        </div>
+    </div>
+
+    <div id="admin-panel" class="hidden container mx-auto p-4 md:p-8">
+        <header class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-bold text-purple-400">Painel de Gestão</h1>
+            <button id="logout-button" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded">Sair</button>
+        </header>
+
+        <div class="bg-gray-800 p-6 rounded-lg shadow-xl mb-8">
+            <h2 class="text-2xl font-semibold mb-4" id="form-title">Adicionar Novo Produto</h2>
+            <form id="product-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <input type="hidden" id="product-id">
+                <input id="nome" type="text" placeholder="Nome do Produto" class="p-2 rounded form-input" required>
+                <input id="categoria" type="text" placeholder="Categoria" class="p-2 rounded form-input" required>
+                <input id="preco_original" type="number" step="0.01" placeholder="Preço Original (MT)" class="p-2 rounded form-input" required>
+                <input id="stock" type="number" placeholder="Stock" class="p-2 rounded form-input" required>
+                <input id="imagem_url" type="text" placeholder="URL da Imagem Principal" class="p-2 rounded form-input">
+                <textarea id="descricao" placeholder="Descrição" class="p-2 rounded form-input md:col-span-2"></textarea>
+                <fieldset class="border border-gray-600 p-3 rounded-lg md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <legend class="px-2 text-purple-400">Promoção (Opcional)</legend>
+                    <input id="preco_desconto" type="number" step="0.01" placeholder="Preço com Desconto (MT)" class="p-2 rounded form-input">
+                    <input id="desconto_fim" type="datetime-local" class="p-2 rounded form-input">
+                </fieldset>
+                <div class="md:col-span-2 flex justify-end space-x-4">
+                    <button type="button" id="cancel-edit" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-6 rounded hidden">Cancelar</button>
+                    <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded">Guardar Produto</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="bg-gray-800 rounded-lg shadow-xl overflow-x-auto">
+            <table class="w-full text-left">
+                <thead class="bg-gray-900">
+                    <tr>
+                        <th class="p-3">Visível</th>
+                        <th class="p-3">Nome</th>
+                        <th class="p-3">Preço</th>
+                        <th class="p-3">Stock</th>
+                        <th class="p-3">Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="product-table-body"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- SDKs do Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+    <script>
+        // --- CONFIGURAÇÃO DO FIREBASE (INSERIDA) ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyATCk_k6qqFbtclEQgRmhxubUvAKDSaAS0",
+            authDomain: "print-palette-loja.firebaseapp.com",
+            projectId: "print-palette-loja",
+            storageBucket: "print-palette-loja.firebasestorage.app",
+            messagingSenderId: "157341958643",
+            appId: "1:157341958643:web:7620ed6c773e9c59e65286",
+            measurementId: "G-MLGPVDBFVZ"
+        };
+        // --------------------------------------------------
+
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        const loginContainer = document.getElementById('login-container');
+        const adminPanel = document.getElementById('admin-panel');
+        const loginForm = document.getElementById('login-form');
+        const loginError = document.getElementById('login-error');
+        const logoutButton = document.getElementById('logout-button');
+        const productForm = document.getElementById('product-form');
+        const productTableBody = document.getElementById('product-table-body');
+        const formTitle = document.getElementById('form-title');
+        const cancelEditBtn = document.getElementById('cancel-edit');
+
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                loginContainer.classList.add('hidden');
+                adminPanel.classList.remove('hidden');
+                carregarProdutosAdmin();
+            } else {
+                loginContainer.classList.remove('hidden');
+                adminPanel.classList.add('hidden');
+            }
+        });
+
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            loginError.textContent = "";
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            auth.signInWithEmailAndPassword(email, password)
+                .catch(error => {
+                    loginError.textContent = "Email ou palavra-passe inválidos.";
+                });
+        });
+
+        logoutButton.addEventListener('click', () => auth.signOut());
+
+        async function carregarProdutosAdmin() {
+            productTableBody.innerHTML = '<tr><td colspan="5" class="text-center p-4">A carregar...</td></tr>';
+            const snapshot = await db.collection('produtos').orderBy('nome').get();
+            productTableBody.innerHTML = '';
+            snapshot.forEach(doc => {
+                const produto = { id: doc.id, ...doc.data() };
+                const precoAtual = produto.preco_desconto || produto.preco_original;
+                const tr = document.createElement('tr');
+                tr.className = 'border-t border-gray-700';
+                tr.innerHTML = `
+                    <td class="p-3">
+                        <label class="switch">
+                            <input type="checkbox" onchange="toggleVisibilidade('${produto.id}', ${produto.visivel})" ${produto.visivel ? 'checked' : ''}>
+                            <span class="slider"></span>
+                        </label>
+                    </td>
+                    <td class="p-3">${produto.nome}</td>
+                    <td class="p-3">${precoAtual.toFixed(2)} MT</td>
+                    <td class="p-3">${produto.stock}</td>
+                    <td class="p-3 space-x-2">
+                        <button onclick="editarProduto('${produto.id}')" class="text-blue-400 hover:text-blue-300"><i class="fas fa-edit"></i></button>
+                        <button onclick="deletarProduto('${produto.id}')" class="text-red-500 hover:text-red-400"><i class="fas fa-trash"></i></button>
+                    </td>
+                `;
+                productTableBody.appendChild(tr);
+            });
+        }
+        
+        productForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('product-id').value;
+            
+            const produtoData = {
+                nome: document.getElementById('nome').value,
+                categoria: document.getElementById('categoria').value,
+                preco_original: parseFloat(document.getElementById('preco_original').value),
+                stock: parseInt(document.getElementById('stock').value),
+                imagem_url: document.getElementById('imagem_url').value,
+                descricao: document.getElementById('descricao').value,
+                preco_desconto: parseFloat(document.getElementById('preco_desconto').value) || null,
+                desconto_fim: document.getElementById('desconto_fim').value ? new Date(document.getElementById('desconto_fim').value) : null,
+            };
+            
+            try {
+                if (id) {
+                    await db.collection('produtos').doc(id).update(produtoData);
+                } else {
+                    produtoData.visivel = true;
+                    await db.collection('produtos').add(produtoData);
+                }
+                productForm.reset();
+                formTitle.textContent = "Adicionar Novo Produto";
+                cancelEditBtn.classList.add('hidden');
+                document.getElementById('product-id').value = '';
+                carregarProdutosAdmin();
+            } catch (error) {
+                console.error("Erro ao guardar produto:", error);
+                alert("Ocorreu um erro ao guardar o produto.");
+            }
+        });
+
+        async function editarProduto(id) {
+            const doc = await db.collection('produtos').doc(id).get();
+            const produto = doc.data();
+
+            document.getElementById('product-id').value = id;
+            document.getElementById('nome').value = produto.nome;
+            document.getElementById('categoria').value = produto.categoria;
+            document.getElementById('preco_original').value = produto.preco_original;
+            document.getElementById('stock').value = produto.stock;
+            document.getElementById('imagem_url').value = produto.imagem_url;
+            document.getElementById('descricao').value = produto.descricao;
+            document.getElementById('preco_desconto').value = produto.preco_desconto;
+            if(produto.desconto_fim && produto.desconto_fim.seconds) {
+                const d = new Date(produto.desconto_fim.seconds * 1000);
+                d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+                document.getElementById('desconto_fim').value = d.toISOString().slice(0, 16);
+            } else {
+                document.getElementById('desconto_fim').value = '';
+            }
+
+            formTitle.textContent = "Editar Produto";
+            cancelEditBtn.classList.remove('hidden');
+            window.scrollTo(0,0);
+        }
+
+        cancelEditBtn.addEventListener('click', () => {
+             productForm.reset();
+             formTitle.textContent = "Adicionar Novo Produto";
+             cancelEditBtn.classList.add('hidden');
+             document.getElementById('product-id').value = '';
+        });
+
+        async function deletarProduto(id) {
+            if (confirm("Tem a certeza que deseja apagar este produto?")) {
+                await db.collection('produtos').doc(id).delete();
+                carregarProdutosAdmin();
+            }
+        }
+        
+        async function toggleVisibilidade(id, estadoAtual) {
+            await db.collection('produtos').doc(id).update({ visivel: !estadoAtual });
+        }
+    </script>
+</body>
+</html>

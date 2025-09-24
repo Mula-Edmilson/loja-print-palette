@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="pt" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <title id="site-title">Print Palette | Produtos Gráficos</title>
+    <meta id="meta-description" name="description" content="Damos vida às suas ideias com a máxima qualidade, desde impressões personalizadas a brindes promocionais.">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta id="og-title" property="og:title" content="Print Palette | Produtos">
+    <meta id="og-description" property="og:description" content="Damos vida às suas ideias com a máxima qualidade, desde impressões personalizadas a brindes promocionais.">
+    <meta id="og-image" property="og:image" content="https://placehold.co/1200x630/1f2937/a78bfa?text=Print+Palette">
+    <meta id="og-url" property="og:url" content="https://seudominio.com/index.html">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body { font-family: 'Poppins', sans-serif; color: #d1d5db; padding-top: 64px; background-color: #111827; }
+        .glassmorphism { background: rgba(31, 41, 55, 0.6); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(55, 65, 81, 0.3); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37); }
+        .header-glass { background: rgba(17, 24, 39, 0.8); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid rgba(55, 65, 81, 0.3); }
+        .strikethrough { text-decoration: line-through; }
+        #categorias::-webkit-scrollbar { display: none; }
+        #categorias { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="text-gray-300">
+
+    <header id="main-header" class="header-glass fixed top-0 left-0 right-0 z-30">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex-shrink-0"><a href="index.html" class="text-2xl font-bold text-purple-400">Print Palette</a></div>
+                <nav class="hidden md:flex items-center space-x-8">
+                    <a href="index.html" class="font-semibold text-purple-400 border-b-2 border-purple-400 pb-1 text-sm">Produtos</a>
+                </nav>
+                <div class="md:hidden"><button id="mobile-menu-button" class="text-gray-400 hover:text-purple-400 focus:outline-none"><i class="fas fa-bars fa-lg"></i></button></div>
+            </div>
+        </div>
+    </header>
+
+    <section class="hero-section relative h-[60vh] flex items-center justify-center text-white text-center overflow-hidden">
+        <video autoplay loop muted playsinline class="absolute top-1/2 left-1/2 w-full h-full object-cover transform -translate-x-1/2 -translate-y-1/2 z-0 opacity-40"><source src="https://video.wixstatic.com/video/819ea0_7461619ea5f94ee0a92c7023be27a9bb/1080p/mp4/file.mp4" type="video/mp4"></video>
+        <div class="z-10 p-4"><h1 class="text-4xl md:text-5xl font-bold">Impressão que Impressiona</h1><p class="mt-4 text-md md:text-lg max-w-2xl mx-auto text-gray-300">Damos vida às suas ideias com a máxima qualidade.</p><a href="#catalogo" class="mt-8 inline-block bg-purple-500 hover:bg-purple-600 text-white font-bold py-3 px-8 rounded-lg text-md transition-transform hover:scale-105 shadow-lg shadow-purple-900/50">Explorar Produtos</a></div>
+    </section>
+
+    <div id="catalogo" class="flex flex-col lg:flex-row container mx-auto mt-12">
+        <main class="w-full lg:w-2/3 xl:w-3/4 p-4 sm:p-6 lg:p-8">
+            <header class="mb-8 text-center"><h2 class="text-3xl md:text-4xl font-bold text-gray-100">Nossos Produtos</h2><p class="text-gray-400 mt-2 text-md">As nossas soluções mais populares.</p></header>
+             <div id="filtros-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8 p-4 glassmorphism rounded-xl">
+                <input type="text" id="pesquisa" placeholder="Pesquisar..." class="w-full px-4 py-2 border border-gray-700 bg-transparent rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none text-sm" oninput="renderizarProdutos()">
+                <select id="ordenar" class="w-full px-4 py-2 border border-gray-700 bg-transparent rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none text-sm" onchange="renderizarProdutos()">
+                    <option value="nenhum">Ordenar por</option>
+                    <option value="preco_asc">Preço: menor para maior</option>
+                    <option value="preco_desc">Preço: maior para menor</option>
+                </select>
+                <label class="flex items-center space-x-3 p-2 rounded-lg">
+                    <input type="checkbox" id="apenasDisponiveis" class="h-4 w-4 rounded text-purple-500 focus:ring-purple-500 bg-gray-700 border-gray-600" onchange="renderizarProdutos()">
+                    <span class="text-sm font-medium text-gray-300">Apenas disponíveis</span>
+                </label>
+            </div>
+            <div id="categorias" class="flex items-center justify-start sm:justify-center space-x-2 overflow-x-auto pb-4 mb-8"></div>
+            <div id="loja" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <div id="loading-indicator" class="col-span-full text-center py-10"><i class="fas fa-spinner fa-spin fa-3x text-purple-400"></i><p class="mt-4 text-gray-400">A carregar produtos...</p></div>
+            </div>
+        </main>
+        <aside id="carrinho-container" class="w-full lg:w-1/3 xl:w-1/4 glassmorphism rounded-xl p-6 h-[calc(100vh-88px)] sticky top-20 overflow-y-auto hidden lg:block"></aside>
+    </div>
+
+    <button id="mobile-cart-button" onclick="toggleMobileCart()" class="lg:hidden fixed bottom-6 right-6 bg-purple-500 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-xl z-40"><i class="fas fa-shopping-cart"></i><span id="mobile-cart-count" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">0</span></button>
+    <div id="mobile-cart-modal" class="fixed inset-0 bg-black bg-opacity-70 z-50 hidden" onclick="toggleMobileCart()"><div id="mobile-cart-content" class="absolute bottom-0 left-0 right-0 bg-gray-900 p-4 rounded-t-2xl max-h-[80vh] overflow-y-auto" onclick="event.stopPropagation()"></div></div>
+    
+    <footer class="bg-gray-900 text-gray-400 mt-20"><div class="container mx-auto px-4 py-8"><div class="flex flex-col md:flex-row justify-between items-center text-center md:text-left"><p class="text-gray-500 text-sm">© 2025 Print Palette. Todos os direitos reservados.</p></div></div></footer>
+
+    <!-- SDKs do Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+    <script>
+        // --- CONFIGURAÇÃO DO FIREBASE (INSERIDA) ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyATCk_k6qqFbtclEQgRmhxubUvAKDSaAS0",
+            authDomain: "print-palette-loja.firebaseapp.com",
+            projectId: "print-palette-loja",
+            storageBucket: "print-palette-loja.firebasestorage.app",
+            messagingSenderId: "157341958643",
+            appId: "1:157341958643:web:7620ed6c773e9c59e65286",
+            measurementId: "G-MLGPVDBFVZ"
+        };
+        // --------------------------------------------------
+
+        const app = firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        let todosProdutos = [];
+        let carrinho = JSON.parse(localStorage.getItem('carrinhoPrintPalette')) || [];
+        let categoriaAtual = "Todos";
+        let countdownInterval;
+
+        document.addEventListener('DOMContentLoaded', carregarProdutos);
+
+        async function carregarProdutos() {
+            const loadingIndicator = document.getElementById('loading-indicator');
+            try {
+                const snapshot = await db.collection("produtos").where("visivel", "==", true).get();
+                todosProdutos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                
+                todosProdutos.forEach(p => {
+                    if (p.desconto_fim && p.desconto_fim.seconds) {
+                        p.desconto_fim = new Date(p.desconto_fim.seconds * 1000);
+                    }
+                });
+
+                mostrarCategorias();
+                renderizarProdutos();
+                actualizarCarrinhoCompleto();
+                iniciarContadores();
+                loadingIndicator?.remove();
+            } catch (error) {
+                console.error("Falha ao carregar produtos:", error);
+                if (loadingIndicator) loadingIndicator.innerHTML = `<p class="col-span-full text-red-400">Falha ao carregar produtos. Verifique a consola (F12).</p>`;
+            }
+        }
+
+        function getPrecoAtual(produto) {
+            const agora = new Date();
+            const temDescontoValido = produto.preco_desconto && produto.desconto_fim && produto.desconto_fim > agora;
+
+            if (temDescontoValido) {
+                return {
+                    preco: produto.preco_desconto,
+                    preco_original_display: produto.preco_original,
+                    tem_desconto: true
+                };
+            }
+            return {
+                preco: produto.preco_original,
+                preco_original_display: null,
+                tem_desconto: false
+            };
+        }
+
+        function renderizarProdutos() {
+            const loja = document.getElementById('loja');
+            loja.innerHTML = '';
+            const termo = document.getElementById('pesquisa').value.toLowerCase();
+            const ordenar = document.getElementById('ordenar').value;
+            const apenasDisponiveis = document.getElementById('apenasDisponiveis').checked;
+
+            let listaFiltrada = todosProdutos.filter(p => {
+                const stockAtual = p.stock - (carrinho.find(i => i.id === p.id)?.quantidade || 0);
+                const disp = !apenasDisponiveis || stockAtual > 0;
+                const cat = categoriaAtual === "Todos" || p.categoria.toLowerCase() === categoriaAtual.toLowerCase();
+                const pesq = p.nome.toLowerCase().includes(termo);
+                return disp && cat && pesq;
+            });
+
+            listaFiltrada.sort((a, b) => {
+                const precoA = getPrecoAtual(a).preco;
+                const precoB = getPrecoAtual(b).preco;
+                if (ordenar === "preco_asc") return precoA - precoB;
+                if (ordenar === "preco_desc") return precoB - precoA;
+                return 0;
+            });
+
+            if (listaFiltrada.length === 0) {
+                loja.innerHTML = `<p class="col-span-full text-center text-gray-500 py-10">Nenhum produto encontrado.</p>`;
+                return;
+            }
+            listaFiltrada.forEach(p => loja.appendChild(criarCardProduto(p)));
+        }
+
+        function criarCardProduto(p) {
+            const div = document.createElement('div');
+            div.className = 'produto-card glassmorphism rounded-xl overflow-hidden transition-transform hover:-translate-y-2 flex flex-col';
+
+            const { preco, preco_original_display, tem_desconto } = getPrecoAtual(p);
+            const itemCarrinho = carrinho.find(i => i.id === p.id);
+            const stockAtual = p.stock - (itemCarrinho?.quantidade || 0);
+            const emStock = stockAtual > 0;
+
+            let descontoHTML = '', precoHTML = `<p class="text-purple-400 font-semibold text-lg my-1">${preco.toFixed(2)} MT</p>`;
+            
+            if (tem_desconto) {
+                const pct = Math.round(((preco_original_display - preco) / preco_original_display) * 100);
+                descontoHTML = `<div class="absolute top-3 right-3 bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-1 rounded-full shadow-md">${pct}% OFF</div>`;
+                precoHTML = `<div class="flex items-baseline space-x-2 my-1"><p class="text-purple-400 font-semibold text-lg">${preco.toFixed(2)} MT</p><p class="text-gray-500 text-sm strikethrough">${preco_original_display.toFixed(2)} MT</p></div>`;
+            }
+
+            div.innerHTML = `
+                <div class="relative">
+                    <img src="${p.imagem_url || 'https://placehold.co/300x300/1f2937/a78bfa?text=Sem+Imagem'}" alt="${p.nome}" class="w-full h-48 object-cover">
+                    ${!emStock ? '<div class="absolute top-0 left-0 bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-br-xl">ESGOTADO</div>' : ''}
+                    ${descontoHTML}
+                </div>
+                <div class="p-4 flex flex-col flex-grow">
+                    <h3 class="text-md font-semibold text-gray-100 truncate" title="${p.nome}">${p.nome}</h3>
+                    <p class="text-sm text-gray-400 mt-1 flex-grow min-h-[40px]">${(p.descricao || '').substring(0, 50)}...</p>
+                    ${precoHTML}
+                    <div id="timer-card-${p.id}" class="text-xs text-red-400 font-semibold h-4 mb-2"></div>
+                    <p class="stock-display text-xs text-gray-500 mb-3 mt-auto">Stock: ${stockAtual}</p>
+                    <button id="btn-add-${p.id}" onclick="adicionarAoCarrinho('${p.id}')" class="w-full text-white font-bold py-2 px-4 rounded-lg transition-all shadow-md text-sm ${!emStock ? 'bg-gray-600 cursor-not-allowed' : (itemCarrinho ? 'bg-green-600 hover:bg-green-700' : 'bg-purple-500 hover:bg-purple-600')}" ${!emStock ? 'disabled' : ''}>
+                        <i class="fas ${itemCarrinho ? 'fa-check' : 'fa-cart-plus'}"></i> ${itemCarrinho ? 'Adicionado' : 'Adicionar'}
+                    </button>
+                </div>`;
+            return div;
+        }
+
+        function adicionarAoCarrinho(id) {
+            const p = todosProdutos.find(p => p.id === id);
+            if (!p) return;
+            const { preco } = getPrecoAtual(p);
+            const item = carrinho.find(i => i.id === id);
+            const stockDisp = p.stock - (item?.quantidade || 0);
+
+            if (stockDisp <= 0) return;
+            if (item) {
+                item.quantidade++;
+                item.preco = preco;
+            } else {
+                carrinho.push({ id: p.id, nome: p.nome, preco: preco, quantidade: 1, imagem_url: p.imagem_url });
+            }
+            salvarCarrinho();
+            actualizarCarrinhoCompleto();
+            actualizarCardProduto(id);
+        }
+
+        function removerDoCarrinho(id, tudo = false) {
+            const idx = carrinho.findIndex(i => i.id === id);
+            if (idx === -1) return;
+            if (tudo || carrinho[idx].quantidade === 1) {
+                carrinho.splice(idx, 1);
+            } else {
+                carrinho[idx].quantidade--;
+            }
+            salvarCarrinho();
+            actualizarCarrinhoCompleto();
+            actualizarCardProduto(id);
+            renderizarProdutos();
+        }
+        
+        function salvarCarrinho() {
+            localStorage.setItem('carrinhoPrintPalette', JSON.stringify(carrinho));
+        }
+
+        function actualizarCarrinhoCompleto() {
+            const total = carrinho.reduce((s, i) => s + i.preco * i.quantidade, 0);
+            const totalItens = carrinho.reduce((s, i) => s + i.quantidade, 0);
+            document.getElementById('carrinho-container').innerHTML = gerarHTMLCarrinho(total);
+            document.getElementById('mobile-cart-content').innerHTML = gerarHTMLCarrinho(total);
+            document.getElementById('mobile-cart-count').innerText = totalItens;
+        }
+
+        function actualizarCardProduto(id) {
+            const card = document.querySelector(`#btn-add-${id}`)?.closest('.produto-card');
+            if (!card) return;
+            const p = todosProdutos.find(pr => pr.id === id);
+            const item = carrinho.find(i => i.id === id);
+            const stockAtual = p.stock - (item?.quantidade || 0);
+            const emStock = stockAtual > 0;
+            card.querySelector('.stock-display').textContent = `Stock: ${stockAtual}`;
+            const btn = card.querySelector(`#btn-add-${id}`);
+            btn.disabled = !emStock;
+            if (!emStock) {
+                btn.className = 'w-full text-white font-bold py-2 px-4 rounded-lg transition-all shadow-md text-sm bg-gray-600 cursor-not-allowed';
+                btn.innerHTML = '<i class="fas fa-times-circle"></i> Esgotado';
+            } else if (item) {
+                btn.className = 'w-full text-white font-bold py-2 px-4 rounded-lg transition-all shadow-md text-sm bg-green-600 hover:bg-green-700';
+                btn.innerHTML = '<i class="fas fa-check"></i> Adicionado';
+            } else {
+                btn.className = 'w-full text-white font-bold py-2 px-4 rounded-lg transition-all shadow-md text-sm bg-purple-500 hover:bg-purple-600';
+                btn.innerHTML = '<i class="fas fa-cart-plus"></i> Adicionar';
+            }
+        }
+        
+        function gerarHTMLCarrinho(total) {
+            let listaItems = carrinho.length === 0 ? '<p class="text-center text-gray-500 my-10 text-sm">O seu carrinho está vazio.</p>' :
+                carrinho.map(i => `
+                    <div class="flex items-center justify-between py-2 border-b border-gray-700">
+                        <div><p class="font-semibold text-sm text-gray-200">${i.nome}</p><p class="text-xs text-purple-400">${i.preco.toFixed(2)} MT</p></div>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="removerDoCarrinho('${i.id}')" class="text-gray-400 hover:text-white w-5 h-5 rounded-full bg-gray-700">-</button>
+                            <span class="text-sm">${i.quantidade}</span>
+                            <button onclick="adicionarAoCarrinho('${i.id}')" class="text-gray-400 hover:text-white w-5 h-5 rounded-full bg-gray-700">+</button>
+                            <button onclick="removerDoCarrinho('${i.id}', true)" class="text-red-500 hover:text-red-400 text-xs"><i class="fas fa-trash-alt"></i></button>
+                        </div>
+                    </div>`).join('');
+            
+            return `
+                <h2 class="text-xl font-bold mb-4 border-b border-gray-700 pb-3 text-gray-100">Seu Pedido</h2>
+                <div class="mb-4">${listaItems}</div>
+                <div class="border-t border-gray-700 pt-3 mb-4">
+                    <div class="flex justify-between items-center text-md"><span>Total:</span><span class="text-xl font-bold text-purple-400">${total.toFixed(2)} MT</span></div>
+                </div>
+                ${carrinho.length > 0 ? `<a href="checkout.html" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 rounded-md shadow-lg text-sm block text-center"><i class="fas fa-shopping-cart mr-2"></i> Ir para o Checkout</a>` : ''}
+            `;
+        }
+
+        function mostrarCategorias() {
+            const categoriasUnicas = ["Todos", ...new Set(todosProdutos.map(p => p.categoria))];
+            const container = document.getElementById("categorias");
+            container.innerHTML = categoriasUnicas.map(cat => `<button class="whitespace-nowrap px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 shadow-sm ${cat === categoriaAtual ? 'bg-purple-500 text-white' : 'bg-gray-800 text-gray-300 hover:bg-gray-700'}" onclick="filtrarCategoria('${cat}')">${cat}</button>`).join("");
+        }
+        function filtrarCategoria(cat) { categoriaAtual = cat; mostrarCategorias(); renderizarProdutos(); }
+        function toggleMobileCart() { document.getElementById('mobile-cart-modal').classList.toggle('hidden'); }
+        function iniciarContadores() {
+             if (countdownInterval) clearInterval(countdownInterval);
+             countdownInterval = setInterval(() => {
+                const agora = new Date();
+                todosProdutos.forEach(p => {
+                    const timerEl = document.getElementById(`timer-card-${p.id}`);
+                    if (!timerEl) return;
+
+                    if (p.desconto_fim && p.desconto_fim > agora) {
+                        const diff = p.desconto_fim.getTime() - agora.getTime();
+                        const d = Math.floor(diff / 86400000); const h = Math.floor((diff % 86400000) / 3600000);
+                        const m = Math.floor((diff % 3600000) / 60000); const s = Math.floor((diff % 60000) / 1000);
+                        timerEl.textContent = `Promo termina em: ${d}d ${h}h ${m}m ${s}s`;
+                    } else if (p.desconto_fim && p.desconto_fim <= agora) {
+                         timerEl.textContent = 'Promoção terminada';
+                         if (getPrecoAtual(p).tem_desconto === false) {
+                            renderizarProdutos();
+                         }
+                    } else {
+                        timerEl.textContent = '';
+                    }
+                });
+             }, 1000);
+        }
+    </script>
+</body>
+</html>
