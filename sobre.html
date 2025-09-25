@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <title>Sobre Nós | Print Palette</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body { font-family: 'Poppins', sans-serif; background-color: #111827; color: #d1d5db; padding-top: 64px; }
+        .glassmorphism { background: rgba(31, 41, 55, 0.6); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(55, 65, 81, 0.3); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37); }
+        .header-glass { background: rgba(17, 24, 39, 0.8); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid rgba(55, 65, 81, 0.3); }
+        .mobile-menu-modal { transition: opacity 0.3s ease, visibility 0.3s ease; }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-300">
+
+    <header id="main-header" class="header-glass fixed top-0 left-0 right-0 z-30">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex-shrink-0"><a href="index.html" class="text-2xl font-bold text-purple-400">Print Palette</a></div>
+                <nav class="hidden md:flex items-center space-x-8">
+                    <a href="index.html" class="font-semibold text-gray-300 hover:text-purple-400 transition-colors text-sm">Produtos</a>
+                    <a href="sobre.html" class="font-semibold text-purple-400 border-b-2 border-purple-400 pb-1 text-sm">Sobre Nós</a>
+                    <a href="checkout.html" class="font-semibold text-gray-300 hover:text-purple-400 transition-colors text-sm">Checkout</a>
+                </nav>
+                <div class="md:hidden flex items-center space-x-4">
+                    <button id="cart-btn" onclick="toggleMobileCart()" class="text-gray-400 hover:text-purple-400 focus:outline-none relative"><i class="fas fa-shopping-cart fa-lg"></i><span id="mobile-cart-count" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">0</span></button>
+                    <button id="mobile-menu-button" class="text-gray-400 hover:text-purple-400 focus:outline-none"><i class="fas fa-bars fa-lg"></i></button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div id="mobile-menu-modal" class="mobile-menu-modal fixed inset-0 z-40 bg-gray-900/90 hidden">
+        <div class="flex flex-col items-center justify-center h-full space-y-8 text-2xl">
+            <button id="close-menu-button" class="absolute top-4 right-4 text-gray-400 hover:text-purple-400"><i class="fas fa-times fa-2x"></i></button>
+            <a href="index.html" class="text-white hover:text-purple-400 transition-colors">Produtos</a>
+            <a href="sobre.html" class="text-white hover:text-purple-400 transition-colors">Sobre Nós</a>
+            <a href="checkout.html" class="text-white hover:text-purple-400 transition-colors">Checkout</a>
+        </div>
+    </div>
+    
+    <main class="container mx-auto p-4 md:p-8">
+        <div class="max-w-4xl mx-auto glassmorphism p-6 rounded-xl">
+            <h1 class="text-3xl font-bold text-white mb-6 text-center">Sobre a Print Palette</h1>
+            <p class="text-lg text-gray-400 mb-4">Bem-vindo à Print Palette, o seu parceiro em soluções de impressão e produtos gráficos. A nossa missão é dar vida às suas ideias com a máxima qualidade, desde impressões personalizadas a brindes promocionais.</p>
+            <p class="text-lg text-gray-400 mb-4">Em cada projeto, combinamos a paixão pela arte com tecnologia de ponta para garantir resultados que superam as expectativas. Acreditamos que cada detalhe conta e trabalhamos incansavelmente para que a sua visão se materialize em cores vibrantes e acabamentos perfeitos.</p>
+            <div id="qualidade" class="mt-8">
+                <h2 class="text-2xl font-semibold text-white mb-4">Nossa Qualidade e Proveniência</h2>
+                <p class="text-gray-400 mb-2">Utilizamos apenas os melhores materiais e tintas ecológicas, garantindo produtos duráveis e amigos do ambiente. As nossas máquinas de impressão de última geração permitem-nos oferecer uma nitidez e fidelidade de cor impressionantes, independentemente do volume do seu pedido.</p>
+                <p class="text-gray-400">Quer se trate de um pequeno projeto pessoal ou de um grande pedido corporativo, a nossa equipa está pronta para o ajudar em cada passo do processo. Confiamos na qualidade do nosso trabalho e na satisfação dos nossos clientes como os nossos maiores trunfos.</p>
+            </div>
+        </div>
+    </main>
+    <footer class="bg-gray-900 text-gray-400 mt-20"><div class="container mx-auto px-4 py-8"><div class="flex flex-col md:flex-row justify-between items-center text-center md:text-left"><p class="text-gray-500 text-sm">© 2025 Print Palette. Todos os direitos reservados.</p></div></div></footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const totalItens = JSON.parse(localStorage.getItem('carrinhoPrintPalette') || '[]').reduce((s, i) => s + i.quantidade, 0);
+            document.getElementById('mobile-cart-count').innerText = totalItens;
+        });
+        
+        document.getElementById('mobile-menu-button').addEventListener('click', () => {
+            document.getElementById('mobile-menu-modal').classList.remove('hidden');
+        });
+        document.getElementById('close-menu-button').addEventListener('click', () => {
+            document.getElementById('mobile-menu-modal').classList.add('hidden');
+        });
+        function toggleMobileCart() { alert('Função não disponível nesta página.'); }
+    </script>
+</body>
+</html>

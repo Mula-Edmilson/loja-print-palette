@@ -6,97 +6,321 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
     <style>
-        body { font-family: 'Poppins', sans-serif; background-color: #111827; color: #d1d5db; }
-        .form-input { background-color: #1f2937; border: 1px solid #374151; color: #d1d5db; }
-         .form-input::placeholder { color: #6b7280; }
+        body { font-family: 'Poppins', sans-serif; background-color: #111827; color: #d1d5db; padding-top: 64px; }
+        .glassmorphism { background: rgba(31, 41, 55, 0.6); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(55, 65, 81, 0.3); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37); }
+        .header-glass { background: rgba(17, 24, 39, 0.8); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid rgba(55, 65, 81, 0.3); }
+        .form-input { background-color: #1f2937; border: 1px solid #374151; color: #d1d5db; transition: border-color 0.3s, box-shadow 0.3s; }
+        .form-input:focus { border-color: #a78bfa; box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.5); outline: none; }
+        .mobile-menu-modal { transition: opacity 0.3s ease, visibility 0.3s ease; }
     </style>
 </head>
-<body class="bg-gray-900">
-
-    <div class="container mx-auto p-4 md:p-8">
-        <header class="text-center mb-8">
-            <a href="index.html" class="text-3xl font-bold text-purple-400">Print Palette</a>
-            <h1 class="text-2xl font-semibold text-gray-100 mt-2">Finalizar Pedido</h1>
-        </header>
-
-        <div class="max-w-4xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div class="bg-gray-800 p-6 rounded-lg">
-                <h2 class="text-xl font-bold mb-4 border-b border-gray-700 pb-3">Resumo do Pedido</h2>
-                <div id="resumo-carrinho" class="space-y-3 mb-4">
-                </div>
-                <div class="border-t border-gray-700 pt-3">
-                    <div class="flex justify-between items-center text-lg">
-                        <span>Total:</span>
-                        <span id="total-carrinho" class="font-bold text-purple-400">0.00 MT</span>
-                    </div>
+<body>
+    <header id="main-header" class="header-glass fixed top-0 left-0 right-0 z-30">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex-shrink-0"><a href="index.html" class="text-2xl font-bold text-purple-400">Print Palette</a></div>
+                <nav class="hidden md:flex items-center space-x-8">
+                    <a href="index.html" class="font-semibold text-gray-300 hover:text-purple-400 transition-colors text-sm">Produtos</a>
+                    <a href="sobre.html" class="font-semibold text-gray-300 hover:text-purple-400 transition-colors text-sm">Sobre Nós</a>
+                    <a href="checkout.html" class="font-semibold text-purple-400 border-b-2 border-purple-400 pb-1 text-sm">Checkout</a>
+                </nav>
+                <div class="md:hidden flex items-center space-x-4">
+                    <button id="cart-btn" onclick="toggleMobileCart()" class="text-gray-400 hover:text-purple-400 focus:outline-none relative"><i class="fas fa-shopping-cart fa-lg"></i><span id="mobile-cart-count" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">0</span></button>
+                    <button id="mobile-menu-button" class="text-gray-400 hover:text-purple-400 focus:outline-none"><i class="fas fa-bars fa-lg"></i></button>
                 </div>
             </div>
+        </div>
+    </header>
 
-            <div class="bg-gray-800 p-6 rounded-lg">
-                <h2 class="text-xl font-bold mb-4">Dados de Entrega</h2>
-                <form id="checkout-form" class="space-y-4">
-                    <input type="text" id="nome-cliente" placeholder="Seu Nome Completo" class="w-full p-3 rounded form-input" required>
-                    <input type="tel" id="telefone-cliente" placeholder="Seu Contacto Telefónico" class="w-full p-3 rounded form-input" required>
-                    <textarea id="morada-cliente" placeholder="Sua Morada e Ponto de Referência" rows="3" class="w-full p-3 rounded form-input" required></textarea>
-                    <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-lg text-lg">
-                        Enviar Pedido por WhatsApp
-                    </button>
-                </form>
-            </div>
+    <div id="mobile-menu-modal" class="mobile-menu-modal fixed inset-0 z-40 bg-gray-900/90 hidden">
+        <div class="flex flex-col items-center justify-center h-full space-y-8 text-2xl">
+            <button id="close-menu-button" class="absolute top-4 right-4 text-gray-400 hover:text-purple-400"><i class="fas fa-times fa-2x"></i></button>
+            <a href="index.html" class="text-white hover:text-purple-400 transition-colors">Produtos</a>
+            <a href="sobre.html" class="text-white hover:text-purple-400 transition-colors">Sobre Nós</a>
+            <a href="checkout.html" class="text-white hover:text-purple-400 transition-colors">Checkout</a>
         </div>
     </div>
 
+    <main class="container mx-auto px-4 py-16">
+        <div class="max-w-3xl mx-auto glassmorphism rounded-xl p-8 shadow-lg">
+            <h1 class="text-3xl font-bold text-center text-gray-100 mb-6">Finalizar Compra</h1>
+            <div id="carrinho-resumo" class="mb-8">
+                <h2 class="text-xl font-semibold mb-4 text-gray-200">Resumo do Pedido</h2>
+                <div id="carrinho-lista" class="space-y-4"></div>
+                <div id="carrinho-total" class="flex justify-between items-center text-lg font-bold mt-4 border-t border-gray-700 pt-4">
+                    <span>Total:</span>
+                    <span id="total-valor" class="text-purple-400">0.00 MT</span>
+                </div>
+            </div>
+            
+            <form id="checkout-form" class="space-y-6">
+                <h2 class="text-xl font-semibold text-gray-200">Dados de Entrega</h2>
+                <div>
+                    <label for="nome-cliente" class="block text-sm font-medium text-gray-400 mb-1">Nome Completo</label>
+                    <input type="text" id="nome-cliente" class="w-full form-input rounded-lg px-4 py-2" required>
+                </div>
+                <div>
+                    <label for="telefone-cliente" class="block text-sm font-medium text-gray-400 mb-1">Telefone (Ex: 84xxxxxxx)</label>
+                    <input type="tel" id="telefone-cliente" class="w-full form-input rounded-lg px-4 py-2" required pattern="[0-9]{9}">
+                </div>
+                <div>
+                    <label for="morada-cliente" class="block text-sm font-medium text-gray-400 mb-1">Morada</label>
+                    <div class="flex items-center space-x-2">
+                        <input type="text" id="morada-cliente" class="w-full form-input rounded-lg px-4 py-2" required>
+                        <button type="button" id="geo-btn" class="bg-purple-500 hover:bg-purple-600 text-white p-3 rounded-lg flex items-center justify-center text-sm transition-colors" title="Usar a minha localização atual">
+                             <i class="fas fa-location-crosshairs"></i>
+                        </button>
+                    </div>
+                    <div id="location-display" class="mt-2 text-sm text-gray-500 hidden">
+                        <p id="lat-display">Latitude: <span id="lat-value"></span></p>
+                        <p id="lon-display">Longitude: <span id="lon-value"></span></p>
+                        <button type="button" id="map-btn" class="mt-2 text-purple-400 hover:text-purple-300 font-semibold" title="Abrir no Google Maps"><i class="fas fa-map-marked-alt mr-1"></i> Ver no Mapa</button>
+                    </div>
+                </div>
+
+                <button type="submit" id="submit-checkout-btn" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-md shadow-lg transition-colors"><i class="fab fa-whatsapp mr-2"></i> Finalizar Pedido via WhatsApp</button>
+            </form>
+        </div>
+    </main>
+
+    <footer class="bg-gray-900 text-gray-400 mt-20"><div class="container mx-auto px-4 py-8"><div class="flex flex-col md:flex-row justify-between items-center text-center md:text-left"><p class="text-gray-500 text-sm">© 2025 Print Palette. Todos os direitos reservados.</p></div></div></footer>
+
     <script>
-        const WHATSAPP_NUMBER = "258873735009";
-        const carrinho = JSON.parse(localStorage.getItem('carrinhoPrintPalette')) || [];
-        
+        // Configuração do Firebase - SUBSTITUA PELAS SUAS CHAVES
+        const firebaseConfig = {
+    apiKey: "AIzaSyATCk_k6qqFbtclEQgRmhxubUvAKDSaAS0",
+    authDomain: "print-palette-loja.firebaseapp.com",
+    projectId: "print-palette-loja",
+    storageBucket: "print-palette-loja.firebasestorage.app",
+    messagingSenderId: "157341958643",
+    appId: "1:157341958643:web:7620ed6c773e9c59e65286"
+};
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        const WHATSAPP_NUMBER = "258846342251";
+        let carrinho = JSON.parse(localStorage.getItem('carrinhoPrintPalette')) || [];
+
         document.addEventListener('DOMContentLoaded', () => {
-            const resumoContainer = document.getElementById('resumo-carrinho');
-            const totalEl = document.getElementById('total-carrinho');
-            const form = document.getElementById('checkout-form');
+            renderizarCarrinho();
+            const totalItens = carrinho.reduce((s, i) => s + i.quantidade, 0);
+            document.getElementById('mobile-cart-count').innerText = totalItens;
+        });
+
+        function renderizarCarrinho() {
+            const lista = document.getElementById('carrinho-lista');
+            const totalValor = document.getElementById('total-valor');
+            let total = 0;
+            lista.innerHTML = '';
             
             if (carrinho.length === 0) {
-                resumoContainer.innerHTML = '<p class="text-gray-400">O seu carrinho está vazio. <a href="index.html" class="text-purple-400 underline">Voltar à loja</a>.</p>';
-                if(form) form.classList.add('hidden');
+                lista.innerHTML = '<p class="text-center text-gray-500">O seu carrinho está vazio. Adicione produtos na página inicial.</p>';
+            } else {
+                carrinho.forEach(item => {
+                    const subtotal = item.preco * item.quantidade;
+                    total += subtotal;
+                    const div = document.createElement('div');
+                    div.className = 'flex items-center justify-between text-sm glassmorphism p-4 rounded-lg';
+                    div.innerHTML = `
+                        <div>
+                            <p class="font-semibold text-gray-200">${item.nome}</p>
+                            <p class="text-xs text-gray-400">${item.quantidade} x ${item.preco.toFixed(2)} MT</p>
+                        </div>
+                        <span class="font-bold text-purple-400">${subtotal.toFixed(2)} MT</span>
+                    `;
+                    lista.appendChild(div);
+                });
+            }
+            totalValor.innerText = `${total.toFixed(2)} MT`;
+        }
+        
+        document.getElementById('geo-btn')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            const moradaInput = document.getElementById('morada-cliente');
+            const latDisplay = document.getElementById('lat-value');
+            const lonDisplay = document.getElementById('lon-value');
+            const locationDisplay = document.getElementById('location-display');
+            const mapBtn = document.getElementById('map-btn');
+
+            if ("geolocation" in navigator) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const lat = position.coords.latitude;
+                        const lon = position.coords.longitude;
+                        moradaInput.value = `Latitude: ${lat}, Longitude: ${lon}`;
+                        latDisplay.textContent = lat.toFixed(6);
+                        lonDisplay.textContent = lon.toFixed(6);
+                        locationDisplay.classList.remove('hidden');
+                        moradaInput.setAttribute('data-lat', lat);
+                        moradaInput.setAttribute('data-lon', lon);
+                        mapBtn.classList.remove('hidden');
+                    },
+                    (error) => {
+                        console.error("Erro ao obter a localização:", error);
+                        alert("Não foi possível obter a sua localização. Por favor, preencha a morada manualmente.");
+                    }
+                );
+            } else {
+                alert("A funcionalidade de geolocalização não é suportada pelo seu navegador.");
+            }
+        });
+
+        document.getElementById('map-btn')?.addEventListener('click', () => {
+            const moradaInput = document.getElementById('morada-cliente');
+            const lat = moradaInput.getAttribute('data-lat');
+            const lon = moradaInput.getAttribute('data-lon');
+            if (lat && lon) {
+                const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
+                window.open(googleMapsUrl, '_blank');
+            } else {
+                alert("Nenhuma localização foi obtida ainda. Por favor, use o botão 'Usar a Minha Localização Atual' primeiro.");
+            }
+        });
+
+        // --- INÍCIO DA NOVA LÓGICA COM TRANSAÇÃO E GESTÃO DE STOCK ---
+        const checkoutForm = document.getElementById('checkout-form');
+        
+        checkoutForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // 1. Configurar o botão de loading
+            const submitBtn = document.getElementById('submit-checkout-btn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processando...';
+
+            const carrinho = JSON.parse(localStorage.getItem('carrinhoPrintPalette')) || [];
+            if (carrinho.length === 0) {
+                alert("O seu carrinho está vazio.");
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fab fa-whatsapp mr-2"></i> Finalizar Pedido via WhatsApp';
                 return;
             }
 
-            let total = 0;
-            resumoContainer.innerHTML = carrinho.map(item => {
-                total += item.preco * item.quantidade;
-                return `
-                    <div class="flex justify-between items-center text-sm">
-                        <span class="flex-1 pr-2">${item.quantidade}x ${item.nome}</span>
-                        <span class="font-semibold">${(item.preco * item.quantidade).toFixed(2)} MT</span>
-                    </div>
-                `;
-            }).join('');
-            
-            totalEl.textContent = `${total.toFixed(2)} MT`;
-        });
-
-        document.getElementById('checkout-form')?.addEventListener('submit', (e) => {
-            e.preventDefault();
+            // 2. Obter dados dos campos existentes no HTML
             const nome = document.getElementById('nome-cliente').value.trim();
-            const telefone = document.getElementById('telefone-cliente').value.trim();
-            const morada = document.getElementById('morada-cliente').value.trim();
-            const total = carrinho.reduce((s, i) => s + i.preco * i.quantidade, 0);
+            const telefone = document.getElementById('telefone-cliente').value.trim(); // Usado como Contacto
+            const moradaInput = document.getElementById('morada-cliente');
+            const morada = moradaInput.value.trim();
+            const lat = moradaInput.getAttribute('data-lat');
+            const lon = moradaInput.getAttribute('data-lon');
+            
+            // Calcular o total
+            let total = carrinho.reduce((acc, item) => acc + (item.preco * item.quantidade), 0);
+            
+            // Dados completos do pedido
+            const pedidoData = {
+                cliente: { 
+                    nome, 
+                    contacto: telefone, 
+                    morada,
+                    linkMapa: (lat && lon) ? `https://www.google.com/maps/search/?api=1&query=${lat},${lon}` : 'Não partilhado'
+                },
+                items: carrinho.map(item => ({ 
+                    id: item.id, 
+                    nome: item.nome, 
+                    quantidade: item.quantidade, 
+                    preco_unitario: item.preco, 
+                    subtotal: item.preco * item.quantidade 
+                })),
+                total: total,
+                data: firebase.firestore.FieldValue.serverTimestamp(),
+                status: 'Pendente',
+            };
 
-            let msg = `*Novo pedido - Print Palette:*\n\n*Itens do Pedido:*\n`;
-            carrinho.forEach(i => {
-                msg += `• ${i.quantidade}x ${i.nome} - *${(i.preco * i.quantidade).toFixed(2)} MT*\n`;
-            });
-            msg += `\n*Total a Pagar: ${total.toFixed(2)} MT*\n\n*Dados de Entrega:*\n*Nome:* ${nome}\n*Telefone:* ${telefone}\n*Morada:* ${morada}`;
-            
-            const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
-            
-            localStorage.removeItem('carrinhoPrintPalette');
-            window.open(whatsappUrl, '_blank');
-            
-            alert("O seu pedido foi enviado! Será redirecionado para a página inicial.");
-            window.location.href = 'index.html';
+            try {
+                let pedidoId = null; 
+
+                // 3. INICIAR TRANSAÇÃO (ATOMICIDADE)
+                await db.runTransaction(async (transaction) => {
+                    const produtosRef = db.collection('produtos');
+
+                    for (const item of carrinho) {
+                        const produtoDocRef = produtosRef.doc(item.id);
+                        // CRÍTICO: Ler o stock atual dentro da transação
+                        const produtoDoc = await transaction.get(produtoDocRef);
+
+                        if (!produtoDoc.exists) {
+                            throw new Error(`O produto '${item.nome}' não existe na base de dados.`);
+                        }
+                        
+                        const stockAtual = produtoDoc.data().stock || 0;
+                        
+                        // CRÍTICO: Verificação de Stock
+                        if (stockAtual < item.quantidade) {
+                            throw new Error(`Stock insuficiente para o produto: ${item.nome}. Disponível: ${stockAtual}`);
+                        }
+
+                        // 4. Deduzir o Stock usando transaction.update
+                        const novoStock = stockAtual - item.quantidade;
+                        transaction.update(produtoDocRef, {
+                            stock: novoStock
+                        });
+                    }
+
+                    // 5. Adicionar o Pedido
+                    const pedidoRef = db.collection('pedidos').doc();
+                    transaction.set(pedidoRef, pedidoData);
+                    pedidoId = pedidoRef.id;
+                });
+
+                // Se a transação for bem-sucedida, prosseguir com o WhatsApp
+                let msg = `*_NOVO PEDIDO (Print Palette)_*\n\n`;
+                msg += `*ID do Pedido:* ${pedidoId}\n\n`;
+                msg += `*---*\n\n`;
+                msg += `*Detalhes do Cliente:*\n`;
+                msg += `*Nome:* ${nome}\n`;
+                msg += `*Telefone:* ${telefone}\n`;
+                msg += `*Morada:* ${morada}\n`; 
+
+                if (lat && lon) {
+                    msg += `*Link para o Mapa:* https://www.google.com/maps/search/?api=1&query=${lat},${lon}\n`;
+                }
+
+                msg += `\n*---*\n\n`;
+                msg += `*Resumo do Pedido:*`;
+                carrinho.forEach(i => {
+                    msg += `\n• ${i.quantidade}x ${i.nome} - *${(i.preco * i.quantidade).toFixed(2)} MT*`;
+                });
+
+                msg += `\n\n*---*\n\n`;
+                msg += `*Total:* ${total.toFixed(2)} MT`;
+
+                const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
+                
+                localStorage.removeItem('carrinhoPrintPalette');
+                submitBtn.innerHTML = '<i class="fab fa-whatsapp mr-2"></i> Pedido Enviado!';
+                
+                alert("O seu pedido foi enviado! Será redirecionado para o WhatsApp.");
+                window.open(whatsappUrl, '_blank');
+                
+            } catch (e) {
+                console.error("Erro na transação/pedido: ", e);
+                
+                const mensagemErro = e.message.includes("Stock insuficiente") 
+                    ? e.message 
+                    : "Ocorreu um erro ao processar o pedido. Por favor, tente novamente.";
+                
+                alert(mensagemErro);
+                
+                // Resetar botão em caso de erro
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fab fa-whatsapp mr-2"></i> Finalizar Pedido via WhatsApp';
+            }
         });
+        // --- FIM DA NOVA LÓGICA COM TRANSAÇÃO E GESTÃO DE STOCK ---
+
+        // Lógica do menu mobile
+        document.getElementById('mobile-menu-button').addEventListener('click', () => {
+            document.getElementById('mobile-menu-modal').classList.remove('hidden');
+        });
+        document.getElementById('close-menu-button').addEventListener('click', () => {
+            document.getElementById('mobile-menu-modal').classList.add('hidden');
+        });
+        function toggleMobileCart() { alert('Funcionalidade de carrinho móvel em construção para esta página.'); }
     </script>
 </body>
 </html>

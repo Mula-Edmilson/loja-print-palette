@@ -20,6 +20,7 @@
         .strikethrough { text-decoration: line-through; }
         #categorias::-webkit-scrollbar { display: none; }
         #categorias { -ms-overflow-style: none; scrollbar-width: none; }
+        .mobile-menu-modal, .modal { transition: opacity 0.3s ease, visibility 0.3s ease; }
     </style>
 </head>
 <body class="text-gray-300">
@@ -30,17 +31,39 @@
                 <div class="flex-shrink-0"><a href="index.html" class="text-2xl font-bold text-purple-400">Print Palette</a></div>
                 <nav class="hidden md:flex items-center space-x-8">
                     <a href="index.html" class="font-semibold text-purple-400 border-b-2 border-purple-400 pb-1 text-sm">Produtos</a>
+                    <a href="sobre.html" class="font-semibold text-gray-300 hover:text-purple-400 transition-colors text-sm">Sobre Nós</a>
+                    <a href="checkout.html" class="font-semibold text-gray-300 hover:text-purple-400 transition-colors text-sm">Checkout</a>
                 </nav>
-                <div class="md:hidden"><button id="mobile-menu-button" class="text-gray-400 hover:text-purple-400 focus:outline-none"><i class="fas fa-bars fa-lg"></i></button></div>
+                <div class="md:hidden flex items-center space-x-4">
+                    <button id="cart-btn" onclick="toggleMobileCart()" class="text-gray-400 hover:text-purple-400 focus:outline-none relative"><i class="fas fa-shopping-cart fa-lg"></i><span id="mobile-cart-count" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">0</span></button>
+                    <button id="mobile-menu-button" class="text-gray-400 hover:text-purple-400 focus:outline-none"><i class="fas fa-bars fa-lg"></i></button>
+                </div>
             </div>
         </div>
     </header>
+
+    <div id="mobile-menu-modal" class="mobile-menu-modal fixed inset-0 z-40 bg-gray-900/90 hidden">
+        <div class="flex flex-col items-center justify-center h-full space-y-8 text-2xl">
+            <button id="close-menu-button" class="absolute top-4 right-4 text-gray-400 hover:text-purple-400"><i class="fas fa-times fa-2x"></i></button>
+            <a href="index.html" class="text-white hover:text-purple-400 transition-colors">Produtos</a>
+            <a href="sobre.html" class="text-white hover:text-purple-400 transition-colors">Sobre Nós</a>
+            <a href="checkout.html" class="text-white hover:text-purple-400 transition-colors">Checkout</a>
+        </div>
+    </div>
 
     <section class="hero-section relative h-[60vh] flex items-center justify-center text-white text-center overflow-hidden">
         <video autoplay loop muted playsinline class="absolute top-1/2 left-1/2 w-full h-full object-cover transform -translate-x-1/2 -translate-y-1/2 z-0 opacity-40"><source src="https://video.wixstatic.com/video/819ea0_7461619ea5f94ee0a92c7023be27a9bb/1080p/mp4/file.mp4" type="video/mp4"></video>
         <div class="z-10 p-4"><h1 class="text-4xl md:text-5xl font-bold">Impressão que Impressiona</h1><p class="mt-4 text-md md:text-lg max-w-2xl mx-auto text-gray-300">Damos vida às suas ideias com a máxima qualidade.</p><a href="#catalogo" class="mt-8 inline-block bg-purple-500 hover:bg-purple-600 text-white font-bold py-3 px-8 rounded-lg text-md transition-transform hover:scale-105 shadow-lg shadow-purple-900/50">Explorar Produtos</a></div>
     </section>
 
+    <section class="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div class="glassmorphism rounded-xl p-8 text-center max-w-4xl mx-auto">
+            <h2 class="text-3xl font-bold text-gray-100 mb-4">Qualidade e Proveniência</h2>
+            <p class="text-gray-400 max-w-2xl mx-auto mb-6">Em cada produto, garantimos a excelência. Utilizamos apenas os melhores materiais e técnicas de impressão de última geração, assegurando que a sua visão se materialize com cores vibrantes, nitidez impressionante e durabilidade superior.</p>
+            <a href="sobre.html#qualidade" class="inline-block bg-purple-500 hover:bg-purple-600 text-white font-bold py-3 px-8 rounded-lg text-md transition-transform hover:scale-105 shadow-lg shadow-purple-900/50">Saber Mais</a>
+        </div>
+    </section>
+    
     <div id="catalogo" class="flex flex-col lg:flex-row container mx-auto mt-12">
         <main class="w-full lg:w-2/3 xl:w-3/4 p-4 sm:p-6 lg:p-8">
             <header class="mb-8 text-center"><h2 class="text-3xl md:text-4xl font-bold text-gray-100">Nossos Produtos</h2><p class="text-gray-400 mt-2 text-md">As nossas soluções mais populares.</p></header>
@@ -64,12 +87,55 @@
         <aside id="carrinho-container" class="w-full lg:w-1/3 xl:w-1/4 glassmorphism rounded-xl p-6 h-[calc(100vh-88px)] sticky top-20 overflow-y-auto hidden lg:block"></aside>
     </div>
 
-    <button id="mobile-cart-button" onclick="toggleMobileCart()" class="lg:hidden fixed bottom-6 right-6 bg-purple-500 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-xl z-40"><i class="fas fa-shopping-cart"></i><span id="mobile-cart-count" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">0</span></button>
-    <div id="mobile-cart-modal" class="fixed inset-0 bg-black bg-opacity-70 z-50 hidden" onclick="toggleMobileCart()"><div id="mobile-cart-content" class="absolute bottom-0 left-0 right-0 bg-gray-900 p-4 rounded-t-2xl max-h-[80vh] overflow-y-auto" onclick="event.stopPropagation()"></div></div>
+    <button id="mobile-cart-button" onclick="toggleMobileCart()" class="lg:hidden fixed bottom-6 right-6 bg-purple-500 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-xl z-40"><i class="fas fa-shopping-cart"></i><span id="mobile-cart-count-float" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">0</span></button>
+    <div id="mobile-cart-modal" class="fixed inset-0 bg-black bg-opacity-70 z-50 hidden" onclick="toggleMobileCart()"><div id="mobile-cart-content" class="absolute bottom-0 left-0 right-0 glassmorphism p-4 rounded-t-2xl max-h-[80vh] overflow-y-auto" onclick="event.stopPropagation()"></div></div>
     
-    <footer class="bg-gray-900 text-gray-400 mt-20"><div class="container mx-auto px-4 py-8"><div class="flex flex-col md:flex-row justify-between items-center text-center md:text-left"><p class="text-gray-500 text-sm">© 2025 Print Palette. Todos os direitos reservados.</p></div></div></footer>
+    <div id="detalhes-modal" class="modal fixed inset-0 z-50 bg-black bg-opacity-70 flex items-center justify-center p-4 hidden" onclick="fecharDetalhesModal()">
+        <div class="glassmorphism rounded-xl p-6 w-full max-w-3xl max-h-[90vh] overflow-y-auto relative" onclick="event.stopPropagation()">
+            <button onclick="fecharDetalhesModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i class="fas fa-times"></i></button>
+            <div class="flex flex-col md:flex-row items-center md:items-start space-y-6 md:space-y-0 md:space-x-8">
+                <img id="modal-imagem" src="" alt="" class="w-full md:w-1/2 h-auto rounded-lg object-cover">
+                <div class="flex-1 text-center md:text-left">
+                    <h3 id="modal-nome" class="text-3xl font-bold text-gray-100 mb-2"></h3>
+                    <p id="modal-descricao" class="text-gray-400 mb-4"></p>
+                    <div id="modal-preco-container" class="flex items-center justify-center md:justify-start space-x-4 mb-4">
+                        <p id="modal-preco-atual" class="text-purple-400 font-semibold text-2xl"></p>
+                        <p id="modal-preco-original" class="text-gray-500 text-lg strikethrough"></p>
+                    </div>
+                    <div id="modal-stock-display" class="text-sm text-gray-500 mb-4"></div>
+                    <div id="modal-timer" class="text-xs text-red-400 font-semibold mb-4"></div>
+                    <button id="modal-btn-add" class="w-full text-white font-bold py-3 px-4 rounded-lg transition-all shadow-md text-sm bg-purple-500 hover:bg-purple-600">
+                        <i class="fas fa-cart-plus mr-2"></i> Adicionar ao Carrinho
+                    </button>
+                    <button id="modal-btn-share" class="w-full text-white font-bold py-3 px-4 rounded-lg transition-all shadow-md text-sm bg-gray-600 hover:bg-gray-700 mt-2">
+                        <i class="fas fa-share-alt mr-2"></i> Partilhar
+                    </button>
+                </div>
+            </div>
+             <div id="produtos-relacionados-section" class="mt-8 border-t border-gray-700 pt-6">
+                <h4 class="text-xl font-bold text-gray-100 mb-4">Produtos Relacionados</h4>
+                <div id="produtos-relacionados-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                    </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer class="bg-gray-900 text-gray-400 mt-20">
+        <div class="container mx-auto px-4 py-8">
+            <div class="mb-8 p-6 glassmorphism rounded-xl max-w-xl mx-auto text-center">
+                <h3 class="text-2xl font-bold mb-2 text-gray-100">Junte-se à Comunidade Print Palette!</h3>
+                <p class="text-gray-400 mb-4 text-sm">Receba as últimas novidades, promoções e produtos exclusivos diretamente no seu WhatsApp.</p>
+                <a href="https://chat.whatsapp.com/SeuLinkAqui" target="_blank" class="inline-flex items-center justify-center bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg text-md transition-colors shadow-lg shadow-green-900/50">
+                    <i class="fab fa-whatsapp fa-lg mr-3"></i> Entrar no Canal do WhatsApp
+                </a>
+            </div>
+            
+            <div class="flex flex-col md:flex-row justify-between items-center text-center md:text-left">
+                <p class="text-gray-500 text-sm">© 2025 Print Palette. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
 
-    <!-- SDKs do Firebase -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
@@ -88,6 +154,15 @@
 
         const app = firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
+        
+        // Dados padrão para as meta tags
+        const defaultTitle = "Print Palette | Produtos Gráficos";
+        const defaultDescription = "Damos vida às suas ideias com a máxima qualidade, desde impressões personalizadas a brindes promocionais.";
+        const defaultImage = "https://placehold.co/1200x630/1f2937/a78bfa?text=Print+Palette";
+        const defaultUrl = window.location.origin + window.location.pathname;
+        
+        // --- Limiar para Portes Grátis ---
+        const FREE_SHIPPING_THRESHOLD = 200;
 
         let todosProdutos = [];
         let carrinho = JSON.parse(localStorage.getItem('carrinhoPrintPalette')) || [];
@@ -95,6 +170,14 @@
         let countdownInterval;
 
         document.addEventListener('DOMContentLoaded', carregarProdutos);
+
+        // Lógica do menu mobile
+        document.getElementById('mobile-menu-button').addEventListener('click', () => {
+            document.getElementById('mobile-menu-modal').classList.remove('hidden');
+        });
+        document.getElementById('close-menu-button').addEventListener('click', () => {
+            document.getElementById('mobile-menu-modal').classList.add('hidden');
+        });
 
         async function carregarProdutos() {
             const loadingIndicator = document.getElementById('loading-indicator');
@@ -186,12 +269,12 @@
 
             div.innerHTML = `
                 <div class="relative">
-                    <img src="${p.imagem_url || 'https://placehold.co/300x300/1f2937/a78bfa?text=Sem+Imagem'}" alt="${p.nome}" class="w-full h-48 object-cover">
+                    <img src="${p.imagem_url || 'https://placehold.co/300x300/1f2937/a78bfa?text=Sem+Imagem'}" alt="${p.nome}" class="w-full h-48 object-cover cursor-pointer" onclick="mostrarDetalhesProduto('${p.id}')">
                     ${!emStock ? '<div class="absolute top-0 left-0 bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-br-xl">ESGOTADO</div>' : ''}
                     ${descontoHTML}
                 </div>
                 <div class="p-4 flex flex-col flex-grow">
-                    <h3 class="text-md font-semibold text-gray-100 truncate" title="${p.nome}">${p.nome}</h3>
+                    <h3 class="text-md font-semibold text-gray-100 truncate cursor-pointer" title="${p.nome}" onclick="mostrarDetalhesProduto('${p.id}')">${p.nome}</h3>
                     <p class="text-sm text-gray-400 mt-1 flex-grow min-h-[40px]">${(p.descricao || '').substring(0, 50)}...</p>
                     ${precoHTML}
                     <div id="timer-card-${p.id}" class="text-xs text-red-400 font-semibold h-4 mb-2"></div>
@@ -202,6 +285,158 @@
                 </div>`;
             return div;
         }
+        
+        function atualizarMetaTags(produto) {
+            document.getElementById('site-title').textContent = `${produto.nome} | Print Palette`;
+            document.getElementById('meta-description').setAttribute('content', produto.descricao.substring(0, 150) + "...");
+            document.getElementById('og-title').setAttribute('content', produto.nome);
+            document.getElementById('og-description').setAttribute('content', produto.descricao);
+            document.getElementById('og-image').setAttribute('content', produto.imagem_url || defaultImage);
+            document.getElementById('og-url').setAttribute('content', window.location.origin + window.location.pathname + `?produtoId=${produto.id}`);
+        }
+        
+        function resetMetaTags() {
+            document.getElementById('site-title').textContent = defaultTitle;
+            document.getElementById('meta-description').setAttribute('content', defaultDescription);
+            document.getElementById('og-title').setAttribute('content', defaultTitle);
+            document.getElementById('og-description').setAttribute('content', defaultDescription);
+            document.getElementById('og-image').setAttribute('content', defaultImage);
+            document.getElementById('og-url').setAttribute('content', defaultUrl);
+        }
+        
+        // --- NOVO: Função para Partilhar Produto ---
+        async function compartilharProduto(id) {
+            const produto = todosProdutos.find(p => p.id === id);
+            if (!produto) return;
+
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: produto.nome,
+                        text: produto.descricao,
+                        url: window.location.origin + window.location.pathname + `?produtoId=${produto.id}`
+                    });
+                    console.log('Conteúdo partilhado com sucesso!');
+                } catch (error) {
+                    console.error('Erro ao partilhar:', error);
+                }
+            } else {
+                alert("A funcionalidade de partilha não é suportada neste navegador.");
+            }
+        }
+
+        function mostrarDetalhesProduto(id) {
+            const p = todosProdutos.find(prod => prod.id === id);
+            if (!p) return;
+
+            atualizarMetaTags(p); // Atualiza as meta tags
+            
+            const modal = document.getElementById('detalhes-modal');
+            const imagem = document.getElementById('modal-imagem');
+            const nome = document.getElementById('modal-nome');
+            const descricao = document.getElementById('modal-descricao');
+            const precoAtual = document.getElementById('modal-preco-atual');
+            const precoOriginal = document.getElementById('modal-preco-original');
+            const btnAdd = document.getElementById('modal-btn-add');
+            const btnShare = document.getElementById('modal-btn-share');
+            const stockDisplay = document.getElementById('modal-stock-display');
+            const timerDisplay = document.getElementById('modal-timer');
+
+            const { preco, preco_original_display, tem_desconto } = getPrecoAtual(p);
+            const itemCarrinho = carrinho.find(i => i.id === p.id);
+            const stockAtual = p.stock - (itemCarrinho?.quantidade || 0);
+            const emStock = stockAtual > 0;
+
+            imagem.src = p.imagem_url || 'https://placehold.co/600x400/1f2937/a78bfa?text=Sem+Imagem';
+            imagem.alt = p.nome;
+            nome.textContent = p.nome;
+            descricao.textContent = p.descricao;
+            precoAtual.textContent = `${preco.toFixed(2)} MT`;
+            
+            if (tem_desconto) {
+                precoOriginal.textContent = `${preco_original_display.toFixed(2)} MT`;
+                precoOriginal.classList.remove('hidden');
+            } else {
+                precoOriginal.classList.add('hidden');
+            }
+
+            stockDisplay.textContent = `Stock disponível: ${stockAtual}`;
+
+            if (p.desconto_fim && p.desconto_fim > new Date()) {
+                const diff = p.desconto_fim.getTime() - new Date().getTime();
+                const d = Math.floor(diff / 86400000); const h = Math.floor((diff % 86400000) / 3600000);
+                const m = Math.floor((diff % 3600000) / 60000); const s = Math.floor((diff % 60000) / 1000);
+                timerDisplay.textContent = `Promoção termina em: ${d}d ${h}h ${m}m ${s}s`;
+                timerDisplay.classList.remove('hidden');
+            } else {
+                timerDisplay.textContent = '';
+                timerDisplay.classList.add('hidden');
+            }
+
+            btnAdd.onclick = () => {
+                adicionarAoCarrinho(p.id);
+                fecharDetalhesModal();
+            };
+            btnShare.onclick = () => {
+                compartilharProduto(p.id);
+            };
+
+            if (!emStock) {
+                btnAdd.textContent = 'Esgotado';
+                btnAdd.disabled = true;
+                btnAdd.classList.add('bg-gray-600', 'cursor-not-allowed');
+                btnAdd.classList.remove('bg-purple-500', 'hover:bg-purple-600');
+            } else {
+                 btnAdd.textContent = 'Adicionar ao Carrinho';
+                 btnAdd.disabled = false;
+                 btnAdd.classList.remove('bg-gray-600', 'cursor-not-allowed');
+                 btnAdd.classList.add('bg-purple-500', 'hover:bg-purple-600');
+            }
+
+            renderizarProdutosRelacionados(p.categoria, p.id);
+            modal.classList.remove('hidden');
+        }
+
+        function fecharDetalhesModal() {
+            document.getElementById('detalhes-modal').classList.add('hidden');
+            resetMetaTags(); // Restaura as meta tags
+        }
+
+        function renderizarProdutosRelacionados(categoria, produtoExcluidoId) {
+            const container = document.getElementById('produtos-relacionados-container');
+            const produtosRelacionados = todosProdutos.filter(p => 
+                p.categoria === categoria && p.id !== produtoExcluidoId
+            ).slice(0, 4); // Limita a 4 produtos
+
+            container.innerHTML = '';
+            if (produtosRelacionados.length > 0) {
+                produtosRelacionados.forEach(p => {
+                    const card = criarCardProdutoSimples(p);
+                    container.appendChild(card);
+                });
+                document.getElementById('produtos-relacionados-section').classList.remove('hidden');
+            } else {
+                document.getElementById('produtos-relacionados-section').classList.add('hidden');
+            }
+        }
+        
+        function criarCardProdutoSimples(p) {
+            const div = document.createElement('div');
+            div.className = 'glassmorphism rounded-xl overflow-hidden cursor-pointer transition-transform hover:scale-105';
+            div.onclick = () => mostrarDetalhesProduto(p.id);
+            
+            const { preco } = getPrecoAtual(p);
+
+            div.innerHTML = `
+                <img src="${p.imagem_url || 'https://placehold.co/150x150/1f2937/a78bfa?text=Sem+Imagem'}" alt="${p.nome}" class="w-full h-24 object-cover">
+                <div class="p-2 text-center">
+                    <p class="text-sm font-semibold text-gray-100 truncate">${p.nome}</p>
+                    <p class="text-xs text-purple-400 mt-1">${preco.toFixed(2)} MT</p>
+                </div>
+            `;
+            return div;
+        }
+
 
         function adicionarAoCarrinho(id) {
             const p = todosProdutos.find(p => p.id === id);
@@ -246,6 +481,7 @@
             document.getElementById('carrinho-container').innerHTML = gerarHTMLCarrinho(total);
             document.getElementById('mobile-cart-content').innerHTML = gerarHTMLCarrinho(total);
             document.getElementById('mobile-cart-count').innerText = totalItens;
+            document.getElementById('mobile-cart-count-float').innerText = totalItens;
         }
 
         function actualizarCardProduto(id) {
@@ -271,6 +507,13 @@
         }
         
         function gerarHTMLCarrinho(total) {
+            // Lógica para a barra de progresso
+            const valorFaltante = FREE_SHIPPING_THRESHOLD - total;
+            const progressPct = Math.min((total / FREE_SHIPPING_THRESHOLD) * 100, 100);
+            const progressMessage = valorFaltante > 0 
+                ? `Faltam <span class="font-bold text-purple-400">${valorFaltante.toFixed(2)} MT</span> para portes grátis!`
+                : `Parabéns! Já tem portes grátis!`;
+            
             let listaItems = carrinho.length === 0 ? '<p class="text-center text-gray-500 my-10 text-sm">O seu carrinho está vazio.</p>' :
                 carrinho.map(i => `
                     <div class="flex items-center justify-between py-2 border-b border-gray-700">
@@ -286,6 +529,12 @@
             return `
                 <h2 class="text-xl font-bold mb-4 border-b border-gray-700 pb-3 text-gray-100">Seu Pedido</h2>
                 <div class="mb-4">${listaItems}</div>
+                <div class="mt-4 p-4 rounded-lg bg-gray-800">
+                    <p class="text-sm text-center mb-2 text-gray-400" id="progress-message">${progressMessage}</p>
+                    <div class="w-full bg-gray-700 rounded-full h-2.5">
+                        <div class="bg-purple-500 h-2.5 rounded-full transition-all duration-500" style="width: ${progressPct}%;"></div>
+                    </div>
+                </div>
                 <div class="border-t border-gray-700 pt-3 mb-4">
                     <div class="flex justify-between items-center text-md"><span>Total:</span><span class="text-xl font-bold text-purple-400">${total.toFixed(2)} MT</span></div>
                 </div>
